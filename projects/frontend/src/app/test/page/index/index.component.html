@@ -1,0 +1,54 @@
+<app-wrapper>
+  <header header class="temper_header">
+    <div class="temper_wrapper">
+      <button (click)="showTemper()" [disabled]="!showResultButton">Show result</button>
+    </div>
+    <div class="temper_progress">
+      <div class="temper_progress-current" #progress></div>
+    </div>
+  </header>
+  <ng-container *ngFor="let table of temperData; index as index">
+    <ng-template
+      [ngTemplateOutlet]="ref"
+      [ngTemplateOutletContext]="{$implicit: table, index}">
+    </ng-template>
+  </ng-container>
+  <footer footer class="temper_footer">
+    <div class="temper_wrapper">
+      <button (click)="showTemper()" [disabled]="!showResultButton">Show result</button>
+    </div>
+  </footer>
+</app-wrapper>
+
+<ng-template #ref let-table let-index="index">
+  <div class="table">
+    <h2 class="table_heading" [innerHTML]="table.title"></h2>
+    <header class="table_header">
+      <ul>
+        <li *ngFor="let head of table.heading" [innerHTML]="head"></li>
+      </ul>
+    </header>
+    <section class="table_section" #bodyTable>
+      <ng-container *ngFor="let line of table.body; index as row">
+        <ul>
+          <li role="button" tabindex="0"
+            *ngFor="let td of line; index as cell"
+            [innerHTML]="td.value"
+            (keyup.arrowup)="onMove($event, { direction: 'UP', row, cell, table: index })"
+            (keyup.arrowleft)="onMove($event, { direction: 'LEFT', row, cell, table: index })"
+            (keyup.arrowdown)="onMove($event, { direction: 'DOWN', row, cell, table: index })"
+            (keyup.arrowright)="onMove($event, { direction: 'RIGHT', row, cell, table: index })"
+            (keyup.enter)="onClick($event, { title: table.title, key: td.key, index: row })"
+            (click)="onClick($event, { title: table.title, key: td.key, index: row })">
+          </li>
+        </ul>
+      </ng-container>
+    </section>
+  </div>
+</ng-template>
+
+<dialog #modal class="dialog">
+  <button (click)="modal.open = false">close</button>
+  <h2>Results</h2>
+  <pre>{{counter | json }}</pre>
+</dialog>
