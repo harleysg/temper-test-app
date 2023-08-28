@@ -48,7 +48,7 @@
 </ng-template>
 
 <dialog #modal class="dialog">
-  <button (click)="modal.open = false">close</button>
+  <button (click)="closeModal()">close</button>
   <h2>Results</h2>
   <pre>{{counter | json }}</pre>
 </dialog>

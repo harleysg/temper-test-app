@@ -105,7 +105,7 @@ export class IndexComponent implements OnInit {
           ++this.counter[key][curr]
         })
       })
-      this.$modal.nativeElement.showModal()
+      this.openModal()
     } else {
       // TODO: toast notifiying
     }
@@ -144,5 +144,13 @@ export class IndexComponent implements OnInit {
 
     target.focus()
     target.scrollIntoView(ScrollIntoViewOptions)
+  }
+
+  closeModal() {
+    this.$modal.nativeElement.close()
+  }
+
+  openModal() {
+    this.$modal.nativeElement.showModal()
   }
 }
