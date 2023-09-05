@@ -38,8 +38,8 @@
             (keyup.arrowleft)="onMove($event, { direction: 'LEFT', row, cell, table: index })"
             (keyup.arrowdown)="onMove($event, { direction: 'DOWN', row, cell, table: index })"
             (keyup.arrowright)="onMove($event, { direction: 'RIGHT', row, cell, table: index })"
-            (keyup.enter)="onClick($event, { title: table.title, key: td.key, index: row })"
-            (click)="onClick($event, { title: table.title, key: td.key, index: row })">
+            (keyup.enter)="onClick($event, { title: table.title, key: td.key, index: row, value: td.value })"
+            (click)="onClick($event, { title: table.title, key: td.key, index: row, value: td.value })">
           </li>
         </ul>
       </ng-container>
