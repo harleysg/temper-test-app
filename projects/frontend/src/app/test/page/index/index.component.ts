@@ -2,54 +2,8 @@ import { AfterViewInit, Component, ElementRef, OnInit, QueryList, ViewChild, Vie
 import { BehaviorSubject } from 'rxjs'
 import { HotToastService } from '@ngneat/hot-toast'
 
-import { DB } from "../../../db"
-
-interface TableTemper {
-  title: string
-  heading?: string[]
-  body: {
-    key: string;
-    value: string;
-  }[][],
-  total: number
-}
-
-interface ResultRow { [index: number]: string }
-
-interface Result {
-  [category: string]: {
-    total?: number
-    [index: number]: string
-  }
-}
-
-interface Counter {
-  [category: string]: {
-    [index: string]: number
-  }
-}
-
-type Direction = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT'
-
-interface OnMove {
-  direction: Direction,
-  row: number,
-  cell: number,
-  table: number,
-}
-
-interface OnClickValues {
-  title: string,
-  key: string,
-  value?: string,
-  index: number
-}
-
-interface ToastBuilder { message: string, duration?: number }
-
-type TemperTable = TableTemper[]
-
-interface LoL { percent: number, currentValue: string, finished: boolean, evenType: string }
+import { CONVENTION, DB, TEMPERS_DICTIONARY, TEMPERS_TYPES } from "../../../db"
+import { Counter, LoL, OnClickValues, OnMove, Result, ResultRow, TemperFeature, TemperResult, TemperTable, TemperTypes, ToastBuilder } from '../../interfaces'
 
 @Component({
   selector: 'app-index',
@@ -57,8 +11,9 @@ interface LoL { percent: number, currentValue: string, finished: boolean, evenTy
   styleUrls: ['./index.component.scss']
 })
 export class IndexComponent implements OnInit, AfterViewInit {
-  public counter!: Counter
+  public counter: Counter = {}
   public result: Result = {}
+  public UIResult: TemperResult[] = []
   public temperData!: TemperTable
   public showResultButton = false
 
@@ -66,7 +21,7 @@ export class IndexComponent implements OnInit, AfterViewInit {
   private preSelected = ''
   private lol$ = new BehaviorSubject({ percent: 0, currentValue: '', finished: false } as LoL)
   private finished = false
-  private keys = ['fortalezas', 'debilidades']
+  private keys = ['strength', 'weakness']
   private _DB = DB
   private _progress: { [key: string]: number, selected: number, total: number } = { total: 0, selected: 0 }
 
@@ -169,15 +124,9 @@ export class IndexComponent implements OnInit, AfterViewInit {
 
   showTemper() {
     if (this.showResultButton) {
-      this.counter = {}
-      Object.entries(this.result).forEach(([key, row]: [string, ResultRow]) => {
-        this.counter[key] = this.counter[key] ?? {}
-        Object.values(row).forEach((curr: string) => {
-          this.counter[key][curr] = this.counter[key][curr] ?? 0
-          ++this.counter[key][curr]
-        })
+      this.buildResults().then(() => {
+        this.openModal()
       })
-      this.openModal()
     }
   }
 
@@ -232,5 +181,50 @@ export class IndexComponent implements OnInit, AfterViewInit {
 
   closeModal() {
     this.$modal.nativeElement.close()
+  }
+
+  buildResults(): Promise<void> {
+    this.counter = {}
+    /**
+     * Create Counter based on results
+     */
+    Object.entries(this.result).forEach(([key, row]: [string, ResultRow]) => {
+      this.counter[key] = this.counter[key] ?? {}
+      Object.values(row).forEach((curr: string) => {
+        const type = CONVENTION[curr]
+        this.counter[key][type] = this.counter[key][type] ?? 0
+        ++this.counter[key][type]
+      })
+    })
+
+    /**
+     * Build final data to show on UI
+     */
+    this.UIResult = Object.entries(this.counter).map(([type, value]) => {
+      const [temper, ranking] = Object.entries(value)
+        .sort(this._sorter)
+        .reduce((prev, curr) => (prev[1] > curr[1]) ? prev : curr)
+      const u = TEMPERS_DICTIONARY[temper] as TemperTypes
+
+      return {
+        type,
+        table: u[(type as keyof TemperTypes)] as TemperFeature[],
+        temper,
+        characterist: u.characterist,
+        ranking
+      }
+    })
+
+    return Promise.resolve()
+  }
+
+  _sorter([, a]: [string, number], [, b]: [string, number]) {
+    if (a > b) {
+      return -1;
+    }
+    if (a < b) {
+      return 1;
+    }
+    return 0;
   }
 }

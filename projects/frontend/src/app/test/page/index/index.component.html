@@ -50,5 +50,26 @@
 <dialog #modal class="dialog">
   <button (click)="closeModal()">close</button>
   <h2>Results</h2>
-  <pre>{{counter | json }}</pre>
+  <ng-container *ngFor="let result of UIResult">
+    <div class="table">
+      <h4 style="margin-bottom: 0; " [innerHTML]="result.type | uppercase"></h4>
+      <h5>
+        <span [innerHTML]="result.temper | lowercase"></span> - 
+        <span [innerHTML]="result.characterist | lowercase"></span>
+      </h5>
+      <header class="table_header">
+        <ul style="
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(375px, 1fr));
+          gap: 1rem;">
+          <ng-container *ngFor="let table of result.table; index as index">
+            <li>
+              <strong>{{table.title | lowercase}}</strong>
+              <p style="margin-bottom: 0;">{{table.description}}</p>
+            </li>
+          </ng-container>
+        </ul>
+      </header>
+    </div>
+  </ng-container>
 </dialog>
