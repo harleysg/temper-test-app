@@ -52,11 +52,12 @@
 }
 
 .dialog {
-  width: 100%;
-  max-width: clamp(400px, 70vw, 650px);
+  width: clamp(400px, 100%, 650px);
+  border: none;
+  box-shadow: 0 0 30px 10px #0000003d;
 
   &::backdrop {
-    inset: 0px;
+    inset: 0;
     position: fixed;
     backdrop-filter: blur(3px);
     background-color: rgba(0 0 0 /0.5);
@@ -113,7 +114,6 @@
       }
 
       &:has(li:focus) {
-        background-color: rgba(115, 248, 166, 0.877) !important;
         color: #181a1b;
       }
 
@@ -122,11 +122,9 @@
         
         &:hover {
           font-weight: bold;
-          // background-color: white;
         }
       }
-  }
-
+    }
   }
 
   ul {
